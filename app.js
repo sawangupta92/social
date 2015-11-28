@@ -9,18 +9,21 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+var db = require('./db/users');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
+
+var authenticateUser = require('./modules/authenticate_user.js')(app, db)
+// (new authenticateUser(app))
+
+app.set('view engine', 'jade');
 
 app.use('/', routes);
 app.use('/users', users);
@@ -57,4 +60,5 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+// module.exports = app;
+app.listen(2000);
