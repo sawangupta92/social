@@ -4,8 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var mongoose = require('mongoose');
 var routes = require('./routes/index');
+var objectId = mongoose.Types.ObjectId;
 var users = require('./routes/users');
 
 var app = express();
@@ -20,7 +21,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
 
-var authenticateUser = require('./modules/authenticate_user.js')(app, db)
+mongoose.connect('mongodb://localhost/social');
+user = require('./models/users.js')
+var authenticateUser = require('./modules/authenticate_user.js')(app, db, user, objectId)
 // (new authenticateUser(app))
 
 app.set('view engine', 'jade');
