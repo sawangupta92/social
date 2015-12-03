@@ -1,4 +1,7 @@
 var mongoose = require('mongoose');
-var User = mongoose.model('users', { fullname: String, password: String });
+var findOneOrCreate = require('mongoose-find-one-or-create');
+var UserSchema = mongoose.Schema({ social_id: String, fullname: String, password: String });
+UserSchema.plugin(findOneOrCreate);
+User = mongoose.model('users', UserSchema);
 
 module.exports = User;
