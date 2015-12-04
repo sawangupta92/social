@@ -12,6 +12,7 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "express-session": "^1.12.1",
+    "fb": "^0.7.3",
     "jade": "~1.11.0",
     "mongoose": "^4.2.6",
     "mongoose-find-one-or-create": "^0.2.0",
@@ -20,6 +21,7 @@
     "passport-facebook": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
+    "passport-twitter": "^1.0.3",
     "serve-favicon": "~2.3.0"
   }
 }

@@ -1,6 +1,7 @@
 var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 var authenticateUser = function(app, db, User, objectId){
 
   this.initializePassport = function() {
@@ -14,6 +15,22 @@ var authenticateUser = function(app, db, User, objectId){
           if (user.password != password) { return cb(null, false); }
           return cb(null, user);
         });
+      }
+    ));
+
+    passport.use(new TwitterStrategy({
+        consumerKey: 'mPuf4oGLAhPgV0Cqn2r1K8loa',
+        consumerSecret: '19k6VOHrmsXdaLV1FlWEZIe3EizKUVWsiKwkKSkYBHw06eZdFZ',
+        callbackURL: "http://771f5ac0.ngrok.com/twit-login/callback"
+      },
+      function(token, tokenSecret, profile, done) {
+        User.findOneOrCreate(
+          { 'social_id': profile.id },
+          { 'social_id': profile.id, 'fullname': profile.username, 'password': profile.id, 'access_token_key': token, 'access_token_secret': tokenSecret }, function(err, user) {
+            if (err) { return done(err) }
+            done(null, user)
+          }
+        )
       }
     ));
 
@@ -46,7 +63,7 @@ var authenticateUser = function(app, db, User, objectId){
   };
 
   this.authenticateLoginRequest = function(){
-    app.post('/login', 
+    app.post('/login',
     passport.authenticate('local', { failureRedirect: '/users/login' }),
     function(req, res) {
       res.redirect('/');
@@ -54,7 +71,7 @@ var authenticateUser = function(app, db, User, objectId){
   }
 
   this.authenticateLoginRequestUsingFacebook = function(){
-    app.get('/fb-login', passport.authenticate('facebook'));
+    app.get('/fb-login', passport.authenticate('facebook', { scope: ['user_status', 'user_posts', 'public_profile'] }));
   };
 
   this.authenticateLoginRequestUsingFacebookCallback = function(){
@@ -65,11 +82,26 @@ var authenticateUser = function(app, db, User, objectId){
     });
   };
 
+  this.authenticateLoginRequestUsingTwitter = function(){
+    app.get('/twit-login', passport.authenticate('twitter'));
+  };
+
+  this.authenticateLoginRequestUsingTwitterCallback = function(){
+    app.get('/twit-login/callback', 
+    passport.authenticate('twitter', { failureRedirect: '/users/login' }),
+    function(req, res) {
+      res.redirect('/');
+    });
+  };
+
   this.initializePassport();
   this.authenticateLoginRequest();
   this.authenticateLoginRequestUsingFacebook();
   this.authenticateLoginRequestUsingFacebookCallback();
+  this.authenticateLoginRequestUsingTwitter();
+  this.authenticateLoginRequestUsingTwitterCallback();
 
 };
 
 module.exports = authenticateUser;
+// /twit-login/callback

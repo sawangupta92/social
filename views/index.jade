@@ -6,6 +6,14 @@ block content
   if user
     div.
       #{user.fullname}
+    a(href='users/logout').
+      Logout
   else
     div.
       Please login first
+    a(href='users/login').
+      Login using app.
+    br
+    br
+    a(href='/fb-login').
+      Login using FB.
