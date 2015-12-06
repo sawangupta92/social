@@ -2,7 +2,17 @@ var passport = require('passport');
 var Strategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
+var Twitter = require('node-twitter-api');
 var authenticateUser = function(app, db, User, objectId){
+
+  this.initializeTwitterAuth = function() {
+    var twitter = new Twitter({
+      consumerKey: 'mPuf4oGLAhPgV0Cqn2r1K8loa',
+      consumerSecret: '19k6VOHrmsXdaLV1FlWEZIe3EizKUVWsiKwkKSkYBHw06eZdFZ',
+      callback: "http://5dd40269.ngrok.com/twit-login/callback"
+    });
+    return twitter;
+  }
 
   this.initializePassport = function() {
     app.use(passport.initialize());
@@ -21,7 +31,7 @@ var authenticateUser = function(app, db, User, objectId){
     passport.use(new TwitterStrategy({
         consumerKey: 'mPuf4oGLAhPgV0Cqn2r1K8loa',
         consumerSecret: '19k6VOHrmsXdaLV1FlWEZIe3EizKUVWsiKwkKSkYBHw06eZdFZ',
-        callbackURL: "http://771f5ac0.ngrok.com/twit-login/callback"
+        callbackURL: "http://5dd40269.ngrok.com/twit-login/callback"
       },
       function(token, tokenSecret, profile, done) {
         User.findOneOrCreate(
@@ -83,14 +93,41 @@ var authenticateUser = function(app, db, User, objectId){
   };
 
   this.authenticateLoginRequestUsingTwitter = function(){
-    app.get('/twit-login', passport.authenticate('twitter'));
+    app.get('/twit-login', function(req, res){
+      var twitter = this.initializeTwitterAuth();
+      twitter.getRequestToken(function(error, requestToken, requestTokenSecret, results){
+        if(error){
+          res.redirect('/');
+        } else{
+          req.session.requestToken = requestToken;
+          req.session.requestTokenSecret = requestTokenSecret;
+          res.redirect(twitter.getAuthUrl(requestToken));
+        }
+      })
+    });
   };
 
   this.authenticateLoginRequestUsingTwitterCallback = function(){
-    app.get('/twit-login/callback', 
-    passport.authenticate('twitter', { failureRedirect: '/users/login' }),
-    function(req, res) {
-      res.redirect('/');
+    app.get('/twit-login/callback',
+    function(req, res, done) {
+      var twitter = this.initializeTwitterAuth();
+      twitter.getAccessToken(req.session.requestToken, req.session.requestTokenSecret, req.query.oauth_verifier, function(error, accessToken, accessTokenSecret, results) {
+        if (error) {
+          console.log(error);
+        } else {
+          User.findOneOrCreate(
+            { 'social_id': results.user_id },
+            { 'social_id': results.user_id, 'fullname': results.screen_name, 'password': req.session.requestTokenSecret, 'access_token_key': accessToken, 'access_token_secret': accessTokenSecret, 'oauth_verifier': req.query.oauth_verifier }, function(err, user) {
+              if(err){
+                res.redirect('/')
+              } else {
+                req.session.passport = { 'user': user._id }
+                res.redirect('/')
+              }
+            }
+          )
+        }
+      });
     });
   };
 

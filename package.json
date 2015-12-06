@@ -17,11 +17,13 @@
     "mongoose": "^4.2.6",
     "mongoose-find-one-or-create": "^0.2.0",
     "morgan": "~1.6.1",
+    "node-twitter-api": "^1.6.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.0.0",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "passport-twitter": "^1.0.3",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "twitter": "^1.2.5"
   }
 }
