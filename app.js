@@ -12,6 +12,8 @@ var session = require('express-session');
 var app = express();
 var db = require('./db/users');
 var MongoStore = require('connect-mongo')(session);
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -32,6 +34,11 @@ var authenticateUser = require('./modules/authenticate_user.js')(app, db, user, 
 // (new authenticateUser(app))
 
 app.set('view engine', 'jade');
+
+app.use(function(req, res, next) {
+  req.io = io;
+  next();
+});
 
 app.use('/', routes);
 app.use('/users', users);
@@ -69,4 +76,4 @@ app.use(function(err, req, res, next) {
 
 
 // module.exports = app;
-app.listen(2000);
+server.listen(2000);

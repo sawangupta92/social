@@ -4,6 +4,23 @@ block content
   h1= title
   p Welcome to #{title}
   if user
+    script(src='/socket.io/socket.io.js')
+    script(src='javascripts/jquery-1.9.1.min.js')
+
+    div(class='container')
+      div(class='col-lg-12')
+        p Input was #{response}
+        div(class=' well bs-component bg-light-div col-lg-8 col-lg-offset-2')
+          pre(class='show-logs').
+            this is here all the stuff goes.
+
+    script.
+      var socket = io.connect('http://45511ec9.ngrok.com/');
+      socket.on('tweet-recieved', function (data) {
+        $('.show-logs').append(data.tweet.text);
+        console.log(data)
+      });
+
     div.
       #{user.fullname}
     a(href='users/logout').

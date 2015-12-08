@@ -9,7 +9,7 @@ var authenticateUser = function(app, db, User, objectId){
     var twitter = new Twitter({
       consumerKey: 'mPuf4oGLAhPgV0Cqn2r1K8loa',
       consumerSecret: '19k6VOHrmsXdaLV1FlWEZIe3EizKUVWsiKwkKSkYBHw06eZdFZ',
-      callback: "http://5dd40269.ngrok.com/twit-login/callback"
+      callback: "http://45511ec9.ngrok.com/twit-login/callback"
     });
     return twitter;
   }
@@ -31,7 +31,7 @@ var authenticateUser = function(app, db, User, objectId){
     passport.use(new TwitterStrategy({
         consumerKey: 'mPuf4oGLAhPgV0Cqn2r1K8loa',
         consumerSecret: '19k6VOHrmsXdaLV1FlWEZIe3EizKUVWsiKwkKSkYBHw06eZdFZ',
-        callbackURL: "http://5dd40269.ngrok.com/twit-login/callback"
+        callbackURL: "http://45511ec9.ngrok.com/twit-login/callback"
       },
       function(token, tokenSecret, profile, done) {
         User.findOneOrCreate(
